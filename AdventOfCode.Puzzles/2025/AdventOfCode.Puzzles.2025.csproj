@@ -6,4 +6,8 @@
   <ItemGroup>
 	<ProjectReference Include="..\..\AdventOfCode.Common\AdventOfCode.Common.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Inputs\" />
+  </ItemGroup>
 </Project>
