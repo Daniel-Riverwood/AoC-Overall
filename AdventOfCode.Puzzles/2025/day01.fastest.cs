@@ -1,7 +1,7 @@
 namespace AdventOfCode.Puzzles._2025;
 
-[Puzzle(2025, 01, CodeType.Original)]
-public class Day_01_Original : IPuzzle
+[Puzzle(2025, 01, CodeType.Fastest)]
+public class Day_01_Fastest : IPuzzle
 {
 	public (string, string) Solve(PuzzleInput input)
 	{
@@ -19,7 +19,7 @@ public class Day_01_Original : IPuzzle
 		foreach (var line in input)
 		{
 			var rot = line[0];
-			int.TryParse(line.Split(rot)[1], out var val);
+			_ = int.TryParse(line.Split(rot)[1], out var val);
 			
 			switch (rot)
 			{
@@ -46,45 +46,32 @@ public class Day_01_Original : IPuzzle
 	{
 		int sum = 0;
 		var cur = 50;
+		var newPos = 0;
 		foreach (var line in input)
 		{
 			var rot = line[0];
-			int.TryParse(line.Split(rot)[1], out var val);
+			_ = int.TryParse(line.Split(rot)[1], out var val);
 
-			switch (rot)
+			var shift = val % 100;
+			sum += (val / 100);
+			
+			if (rot == 'L')
 			{
-				case 'L':
-					for(var i = 0; i < val; i++)
-					{
-						cur--;
-						if (cur == 0)
-						{
-							sum++;
-						}
-						if (cur < 0)
-						{
-							cur = 99;
-						}
-					}
-					break;
-				case 'R':
-					for (var i = 0; i < val; i++)
-					{
-						cur++;
-						if (cur == 0)
-						{
-							sum++;
-						}
-						if (cur > 99)
-						{
-							cur = 0;
-							sum++;
-						}
-					}
-					break;
-				default:
-					break;
+				newPos = (cur - shift + 100) % 100;
+				if ((newPos > cur || newPos == 0) && cur != 0)
+				{
+					sum++;
+				}
 			}
+			else
+			{
+				newPos = (cur + shift) % 100;
+				if (newPos < cur)
+				{
+					sum += 1;
+				}
+			}
+			cur = newPos;
 		}
 
 		return $"{sum}";
