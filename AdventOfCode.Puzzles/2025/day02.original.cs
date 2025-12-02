@@ -24,15 +24,10 @@ public class Day_02_Original : IPuzzle
 			var split = part.Split("-");
 			_ = long.TryParse(split[0], out var start);
 			_ = long.TryParse(split[1], out var end);
-			var p = new Regex("^(.+)\\1$");
 			for (var i = start; i <= end; i++)
 			{
 				var val = i.ToString();
-				if (p.Match(val).Success)
-				{
-					sum += i;
-				}
-					if (val.Length % 2 != 0)
+				if (val.Length % 2 != 0)
 				{
 					continue;
 				}

@@ -18,17 +18,23 @@ public class Day_02_Fastest : IPuzzle
 	{
 		long sum = 0;
 		var parts = input.Split(",");
-		var p = new Regex("^(.+)\\1$");
 
 		foreach (var part in parts)
 		{
 			var split = part.Split("-");
 			_ = long.TryParse(split[0], out var start);
 			_ = long.TryParse(split[1], out var end);
-			for (var i = start; i <= end; i++)
+			for (long i = start; i <= end; i++)
 			{
-				var val = i.ToString();
-				if (p.Match(val).Success)
+				long val = (long)(Math.Log10(i) + 1);
+				if (val % 2 != 0)
+				{
+					continue;
+				}
+
+				long div = (long)Math.Pow(10, (long)(val / 2));
+
+				if (i / div == i % div)
 				{
 					sum += i;
 				}
@@ -42,7 +48,6 @@ public class Day_02_Fastest : IPuzzle
 	{
 		long sum = 0;
 		var parts = input.Split(",");
-		var p = new Regex("^(.+)\\1+$");
 
 		foreach (var part in parts)
 		{
@@ -50,12 +55,21 @@ public class Day_02_Fastest : IPuzzle
 			_ = long.TryParse(split[0], out var start);
 			_ = long.TryParse(split[1], out var end);
 
-			for (var i = start; i <= end; i++)
+			for (long i = start; i <= end; i++)
 			{
-				var val = i.ToString();
-				if (p.Match(val).Success)
+				long val = (long)(Math.Log10(i) + 1);
+
+				for (long cur = 1; cur <= (long)(val / 2); cur++)
 				{
-					sum += i;
+					long patt = (long)(i / Math.Pow(10, val - cur));
+					long div = (long)(Math.Pow(10, cur) - 1);
+					long mul = (long)(Math.Pow(10, val) - 1);
+
+					if(i * div == patt * mul)
+					{
+						sum += i;
+						break;
+					}
 				}
 			}
 		}
