@@ -42,6 +42,37 @@ public class Day_03_Original : IPuzzle
 				active += 1;
 				curBank = curBank.Skip(validMaxPos).ToList();
 			}
+			//int curmax = 0;
+
+			//for (int i = 0; i < intlist.Count; i++)
+			//{
+			//	int highOne = 0;
+			//	int highTwo = 0;
+			//	int highCur = 0;
+			//	if (intlist[i] >= highOne)
+			//	{
+			//		highOne = intlist[i];
+
+			//		for (int x = i + 1; x < intlist.Count; x++)
+			//		{
+			//			if (intlist[x] > highTwo)
+			//			{
+			//				highTwo = intlist[x];
+			//			}
+			//		}
+
+			//		if (highTwo != 0)
+			//		{
+			//			highCur = int.Parse(string.Join("", highOne, highTwo));
+			//		}
+			//	}
+
+
+			//	if (highCur > curmax)
+			//	{
+			//		curmax = highCur;
+			//	}
+			//}
 
 			sum += long.Parse(curmax);
 		}
