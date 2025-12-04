@@ -32,56 +32,59 @@ public class Day_04_Original : IPuzzle
 			for(var x = 0; x < map[i].Length; x++)
 			{
 				int numAdj = 0;
-				if (i > 0)
+				if (map[i][x] == '@')
 				{
-					if (map[i - 1][x] == '@')
+					if (i > 0)
+					{
+						if (map[i - 1][x] == '@')
+						{
+							numAdj++;
+						}
+
+						if (x > 0 && map[i - 1][x - 1] == '@')
+						{
+							numAdj++;
+						}
+
+						if (x < map[i].Length - 1 && map[i - 1][x + 1] == '@')
+						{
+							numAdj++;
+						}
+					}
+
+					if (x > 0 && map[i][x - 1] == '@')
 					{
 						numAdj++;
 					}
 
-					if (x > 0 && map[i - 1][x - 1] == '@')
+					if (i < map.Length - 1)
+					{
+						if (map[i + 1][x] == '@')
+						{
+							numAdj++;
+						}
+
+						if (x > 0 && map[i + 1][x - 1] == '@')
+						{
+							numAdj++;
+						}
+					}
+
+					if (x < map[i].Length - 1 && map[i][x + 1] == '@')
 					{
 						numAdj++;
 					}
 
-					if (x < map[i].Length - 1 && map[i - 1][x + 1] == '@')
-					{
-						numAdj++;
-					}
-				}
 
-				if (x > 0 && map[i][x - 1] == '@')
-				{
-					numAdj++;
-				}
-
-				if (i < map.Length - 1)
-				{
-					if (map[i + 1][x] == '@')
+					if (x < map[i].Length - 1 && i < map[i].Length - 1 && map[i + 1][x + 1] == '@')
 					{
 						numAdj++;
 					}
 
-					if (x > 0 && map[i + 1][x - 1] == '@')
+					if (numAdj < 4)
 					{
-						numAdj++;
+						sum++;
 					}
-				}
-
-				if (x < map[i].Length - 1 && map[i][x + 1] == '@')
-				{
-					numAdj++;
-				}
-
-
-				if (x < map[i].Length - 1 && i < map[i].Length - 1 && map[i + 1][x + 1] == '@')
-				{
-					numAdj++;
-				}
-
-				if (numAdj < 4)
-				{
-					sum++;
 				}
 			}
 		}
