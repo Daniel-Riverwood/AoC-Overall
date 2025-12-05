@@ -46,6 +46,7 @@ public class Day_05_Original : IPuzzle
 	{
 		long sum = 0;
 		List<(long start, long end)> freshRanges = new List<(long start, long end)>();
+		List<(long start, long end)> fullRanges = new List<(long start, long end)>();
 		foreach (var line in input)
 		{
 			var split = line.Split('-');
@@ -55,8 +56,6 @@ public class Day_05_Original : IPuzzle
 			}
 		}
 		freshRanges = freshRanges.OrderBy(q => q.start).ToList();
-		
-		var fullRanges = new List<(long start, long end)>();
 		foreach (var range in freshRanges)
 		{
 			if (fullRanges.Count == 0)
@@ -65,10 +64,10 @@ public class Day_05_Original : IPuzzle
 			}
 			else
 			{
-				var last = fullRanges.Last();
-				if (range.start <= last.end + 1)
+				var prev = fullRanges.Last();
+				if (range.start <= prev.end)
 				{
-					fullRanges[fullRanges.Count - 1] = (last.start, Math.Max(last.end, range.end));
+					fullRanges[fullRanges.Count - 1] = (prev.start, Math.Max(prev.end, range.end));
 				}
 				else
 				{
