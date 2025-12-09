@@ -69,6 +69,17 @@ namespace Utilities
                 CompassDirection.W => CompassDirection.S,
             };
         }
+		
+		public static IEnumerable<(T, T)> Pairs<T>(this IEnumerable<T> array)
+		{
+			if (array.Count() < 2)
+				throw new ArgumentException("Array length can't be less than number of selected elements");
+			T[] result = new T[2];
+			foreach (int[] j in Combinations(2, array.Count()))
+			{
+				yield return (array.ElementAt(j[0]), array.ElementAt(j[1]));
+			}
+		}
 
         /// <summary>
         /// Turns a string into a list of ints. 
