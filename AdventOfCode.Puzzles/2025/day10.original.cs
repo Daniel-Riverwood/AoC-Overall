@@ -1,5 +1,6 @@
+using System.Collections.Concurrent;
 using System.Globalization;
-
+using Microsoft.Z3;
 namespace AdventOfCode.Puzzles._2025;
 
 [Puzzle(2025, 10, CodeType.Original)]
@@ -16,8 +17,8 @@ public class Day_10_Original : IPuzzle
 
 	private string ProcessInput1(string[] input)
 	{
-		long sum = 0;
-		foreach (var lines in input)
+		ConcurrentBag<long> sum = [];
+		input.AsParallel().ForEach(lines =>
 		{
 			long minpresses = long.MaxValue;
 			var priorityQueue = new PriorityQueue<(int[] buttons, bool[] lights), int>();
@@ -78,84 +79,58 @@ public class Day_10_Original : IPuzzle
 				}
 			}
 
-			sum += minpresses;
-		}
-		return $"{sum}";
+			sum.Add(minpresses);
+		});
+		return $"{sum.Sum()}";
 	}
-	
+
 	private string ProcessInput2(string[] input)
 	{
-		long sum = 0;
+		ConcurrentBag<long> sum = [];
 		input.AsParallel().ForEach(lines =>
 		{
-			long minpresses = long.MaxValue;
-			var priorityQueue = new PriorityQueue<(int[] buttons, int[] joltage), int>();
+			using var context = new Context();
+			using var optimizer = context.MkOptimize();
 			var splits = lines.Split(" ");
-			var finalTarget = splits.Last().Trim('{').Trim('}').Split(',');
+			var joltages = splits.Last()[1..^1].Split(',').Select(int.Parse).ToArray();
 			var buttonIndexes = splits.Skip(1).SkipLast(1).ToList();
-			int[] target = new int[finalTarget.Length];
-			int[][] buttons = new int[buttonIndexes.Count][];
-			for (int x = 0; x < finalTarget.Length; x++)
+			List<HashSet<int>> buttons = [];
+
+			int index = 0;
+			while (index < buttonIndexes.Count)
 			{
-				target[x] = int.Parse(finalTarget[x]);
+				buttons.Add(buttonIndexes[index][1..^1].Split(',').Select(int.Parse).ToHashSet());
+				index++;
 			}
 
-			for (int x = 0; x < buttonIndexes.Count; x++)
+			var presses = Enumerable.Range(0, buttons.Count)
+				.Select(i => context.MkIntConst($"p{i}"))
+				.ToArray();
+
+			foreach (var press in presses)
 			{
-				var buttonoptions = buttonIndexes[x].Split(',');
-				buttons[x] = new int[buttonoptions.Length];
-				for (int y = 0; y < buttonoptions.Length; y++)
-				{
-					buttonoptions[y] = buttonoptions[y].Trim('(').Trim(')');
-					if (int.TryParse(buttonoptions[y], out int validButton))
-					{
-						buttons[x][y] = validButton;
-					}
-				}
-				priorityQueue.Enqueue((buttons[x], new int[target.Length]), 0);
+				optimizer.Add(context.MkGe(press, context.MkInt(0)));
 			}
 
 
-			while (priorityQueue.TryDequeue(out var element, out int presses))
+			for (int x = 0; x < joltages.Length; x++)
 			{
-				if (Enumerable.SequenceEqual(element.joltage, target))
-				{
-					if (minpresses >= presses)
-					{
-						minpresses = presses;
-						break;
-					}
-				}
+				var affect = presses.Where((_, b) => buttons[b].Contains(x)).ToArray();
 
-				var newJoltage = new int[element.joltage.Length];
-				for (int x = 0; x < element.joltage.Length; x++)
+				if (affect.Length > 0)
 				{
-					newJoltage[x] = element.joltage[x];
-				}
-				var canBreak = false;
-				for (int x = 0; x < element.buttons.Length; x++)
-				{
-					newJoltage[element.buttons[x]]++;
-					if (newJoltage[element.buttons[x]] > target[element.buttons[x]])
-					{
-						canBreak = true;
-						break;
-					}
-				}
-
-				if (canBreak)
-				{
-					continue;
-				}
-				int pressCount = presses + 1;
-				for (int x = 0; x < buttons.Length; x++)
-				{
-					priorityQueue.Enqueue((buttons[x], newJoltage), pressCount);
+					var total = affect.Length == 1 ? affect[0] : context.MkAdd(affect);
+					optimizer.Add(context.MkEq(total, context.MkInt(joltages[x])));
 				}
 			}
 
-			sum += minpresses;
+			optimizer.MkMinimize(presses.Length == 1 ? presses[0] : context.MkAdd(presses));
+			optimizer.Check();
+
+			var result = optimizer.Model;
+
+			sum.Add(presses.Sum(x => ((IntNum)result.Evaluate(x, true)).Int64));
 		});
-		return $"{sum}";
+		return $"{sum.Sum()}";
 	}
 }
